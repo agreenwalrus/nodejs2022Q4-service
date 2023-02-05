@@ -18,7 +18,7 @@ export class UserService {
   }
 
   findAll(): UserEntity[] {
-    return this.userRepository.getAll().map((u) => u);
+    return this.userRepository.getAll();
   }
 
   findOne(id: string): UserEntity {

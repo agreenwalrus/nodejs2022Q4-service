@@ -10,14 +10,14 @@ import { InMemoryDBModule } from '@nestjs-addons/in-memory-db';
 
 @Module({
   imports: [
-    InMemoryDBModule.forRoot({}),
-    ArtistModule,
     UserModule,
-    FavoritesModule,
-    TrackModule,
+    ArtistModule,
     AlbumModule,
+    TrackModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
+
   providers: [AppService],
 })
 export class AppModule {}
