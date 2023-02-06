@@ -3,10 +3,6 @@ import { InMemoryDBModule } from '@nestjs-addons/in-memory-db';
 import { TrackService } from './track.service';
 import { TrackController } from './track.controller';
 import { TrackRepository } from './in-memory/track.repository';
-import { ArtistModule } from 'src/artist/artist.module';
-import { FavoritesModule } from 'src/favorites/favorites.module';
-import { AlbumModule } from 'src/album/album.module';
-import { forwardRef } from '@nestjs/common/utils';
 
 @Module({
   controllers: [TrackController],

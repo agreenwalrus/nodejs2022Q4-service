@@ -5,6 +5,7 @@ import {
   ValidateIf,
   IsUUID,
 } from 'class-validator';
+import { UUID_VERSION } from 'src/utils/constants';
 
 export class CreateAlbumDto {
   @IsNotEmpty()
@@ -16,7 +17,7 @@ export class CreateAlbumDto {
   year: number;
 
   @IsNotEmpty()
-  @IsUUID(4)
+  @IsUUID(UUID_VERSION)
   @ValidateIf((obj, val) => val !== null)
   artistId: string | null;
 }

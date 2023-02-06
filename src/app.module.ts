@@ -6,7 +6,6 @@ import { UserModule } from './user/user.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { TrackModule } from './track/track.module';
 import { AlbumModule } from './album/album.module';
-import { InMemoryDBModule } from '@nestjs-addons/in-memory-db';
 
 @Module({
   imports: [

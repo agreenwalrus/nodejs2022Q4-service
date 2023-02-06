@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { InMemoryDBService, InjectInMemoryDBService } from '@nestjs-addons/in-memory-db';
+import {
+  InMemoryDBService,
+  InjectInMemoryDBService,
+} from '@nestjs-addons/in-memory-db';
 import { TrackEntity } from '../entities/track.entity';
 import { CreateTrackDto } from '../dto/create-track.dto';
 
 @Injectable()
 export class TrackRepository {
-  constructor(@InjectInMemoryDBService('track') readonly db: InMemoryDBService<TrackEntity>) {}
+  constructor(
+    @InjectInMemoryDBService('track')
+    readonly db: InMemoryDBService<TrackEntity>,
+  ) {}
 
   create(createTrackDto: CreateTrackDto): TrackEntity {
     return new TrackEntity(this.db.create(new TrackEntity(createTrackDto)));

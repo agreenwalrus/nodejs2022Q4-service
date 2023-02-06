@@ -15,7 +15,10 @@ export class FavoriteRepository {
   }
 
   get(): Favorites {
-    return this.db.getAll().map((u) => new Favorites(u)).pop();
+    return this.db
+      .getAll()
+      .map((u) => new Favorites(u))
+      .pop();
   }
 
   update(favorites: Favorites): Favorites {

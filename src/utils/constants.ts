@@ -9,3 +9,5 @@ export const ARTIST_ENTITY_NOT_FAVORITE_ERROR =
   'The artist is not in favorites';
 export const TRACK_ENTITY_NOT_FAVORITE_ERROR = 'The track is not in favorites';
 export const ALBUM_ENTITY_NOT_FAVORITE_ERROR = 'The album is not in favorites';
+
+export const UUID_VERSION = 4;
