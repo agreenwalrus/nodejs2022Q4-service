@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 
 export class UserEntity {
   @ApiProperty({ description: 'Id', format: 'UUIDv4' })
@@ -20,16 +21,11 @@ export class UserEntity {
   @Exclude()
   password: string;
 
-  constructor(partial: Partial<UserEntity>) {
-    Object.assign(this, partial);
-    if (partial.version === undefined) {
-      this.version = 1;
-    }
-    if (partial.createdAt === undefined) {
-      this.createdAt = Date.now();
-    }
-    if (partial.updatedAt === undefined) {
-      this.updatedAt = Date.now();
-    }
+  constructor(partial: Partial<User>) {
+    Object.assign(this, {
+      ...partial,
+      createdAt: partial.createdAt.getTime(),
+      updatedAt: partial.updatedAt.getTime(),
+    });
   }
 }

@@ -14,9 +14,10 @@ import { ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UuidParameterDto } from 'src/utils/dto/uuid.dto';
+
 import { StatusCodes } from 'http-status-codes';
 import { UserEntity } from './entities/user.entity';
+import { ParseUUIDPipe } from '@nestjs/common/pipes';
 
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -34,7 +35,7 @@ export class UserController {
     status: StatusCodes.BAD_REQUEST,
     description: 'The artist is not found',
   })
-  create(@Body() createUserDto: CreateUserDto): UserEntity {
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
     return this.userService.create(createUserDto);
   }
 
@@ -44,7 +45,7 @@ export class UserController {
     description: 'The found record',
     type: [UserEntity],
   })
-  getAll(): UserEntity[] {
+  async getAll(): Promise<UserEntity[]> {
     return this.userService.findAll();
   }
 
@@ -63,8 +64,8 @@ export class UserController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  getById(@Param() params: UuidParameterDto): UserEntity {
-    return this.userService.findOne(params.id);
+  async getById(@Param('id', ParseUUIDPipe) id: string): Promise<UserEntity> {
+    return this.userService.findOne(id);
   }
 
   @Put(':id')
@@ -83,11 +84,11 @@ export class UserController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  update(
-    @Param() params: UuidParameterDto,
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
-  ): UserEntity {
-    return this.userService.updatePassword(params.id, updatePasswordDto);
+  ): Promise<UserEntity> {
+    return this.userService.updatePassword(id, updatePasswordDto);
   }
 
   @Delete(':id')
@@ -105,7 +106,7 @@ export class UserController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  delete(@Param() params: UuidParameterDto) {
-    this.userService.remove(params.id);
+  async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    await this.userService.remove(id);
   }
 }

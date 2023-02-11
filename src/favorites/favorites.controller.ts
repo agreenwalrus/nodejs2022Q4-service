@@ -10,9 +10,10 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiParam } from '@nestjs/swagger';
 import { FavoritesService } from './favorites.service';
-import { UuidParameterDto } from 'src/utils/dto/uuid.dto';
+
 import { StatusCodes } from 'http-status-codes';
 import { FavoritesEntity } from './entities/favorites.entity';
+import { ParseUUIDPipe } from '@nestjs/common/pipes';
 
 @Controller('favs')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -44,8 +45,8 @@ export class FavoritesController {
     description: "The artist doesn't exists",
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  addArtist(@Param() params: UuidParameterDto): FavoritesEntity {
-    return this.favoritesService.addArtist(params.id);
+  addArtist(@Param('id', ParseUUIDPipe) id: string): FavoritesEntity {
+    return this.favoritesService.addArtist(id);
   }
 
   @Delete('artist/:id')
@@ -63,8 +64,8 @@ export class FavoritesController {
     description: 'The artist is not in favorites',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  removeArtist(@Param() params: UuidParameterDto) {
-    this.favoritesService.removeArtist(params.id);
+  removeArtist(@Param('id', ParseUUIDPipe) id: string) {
+    this.favoritesService.removeArtist(id);
   }
 
   @Post('album/:id')
@@ -82,8 +83,8 @@ export class FavoritesController {
     description: "The album doesn't exists",
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  addAlbum(@Param() params: UuidParameterDto): FavoritesEntity {
-    return this.favoritesService.addAlbum(params.id);
+  addAlbum(@Param('id', ParseUUIDPipe) id: string): FavoritesEntity {
+    return this.favoritesService.addAlbum(id);
   }
 
   @Delete('album/:id')
@@ -101,8 +102,8 @@ export class FavoritesController {
     description: 'The album is not in favorites',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  removeAlbum(@Param() params: UuidParameterDto) {
-    this.favoritesService.removeAlbum(params.id);
+  removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
+    this.favoritesService.removeAlbum(id);
   }
 
   @Post('track/:id')
@@ -120,8 +121,8 @@ export class FavoritesController {
     description: "The track doesn't exists",
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  addTrack(@Param() params: UuidParameterDto): FavoritesEntity {
-    return this.favoritesService.addTrack(params.id);
+  addTrack(@Param('id', ParseUUIDPipe) id: string): FavoritesEntity {
+    return this.favoritesService.addTrack(id);
   }
 
   @Delete('track/:id')
@@ -139,7 +140,7 @@ export class FavoritesController {
     description: 'The track is not in favorites',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  removeTrack(@Param() params: UuidParameterDto) {
-    this.favoritesService.removeTrack(params.id);
+  removeTrack(@Param('id', ParseUUIDPipe) id: string) {
+    this.favoritesService.removeTrack(id);
   }
 }

@@ -14,9 +14,10 @@ import { ApiBody, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { UuidParameterDto } from 'src/utils/dto/uuid.dto';
+
 import { StatusCodes } from 'http-status-codes';
 import { ArtistEntity } from './entities/artist.entity';
+import { ParseUUIDPipe } from '@nestjs/common/pipes';
 
 @Controller('artist')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -59,8 +60,8 @@ export class ArtistController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  getById(@Param() params: UuidParameterDto): ArtistEntity {
-    return this.artistService.findOne(params.id);
+  getById(@Param('id', ParseUUIDPipe) id: string): ArtistEntity {
+    return this.artistService.findOne(id);
   }
 
   @Put(':id')
@@ -80,10 +81,10 @@ export class ArtistController {
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
   update(
-    @Param() params: UuidParameterDto,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdateArtistDto,
   ): ArtistEntity {
-    return this.artistService.update(params.id, updatePasswordDto);
+    return this.artistService.update(id, updatePasswordDto);
   }
 
   @Delete(':id')
@@ -101,7 +102,7 @@ export class ArtistController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  delete(@Param() params: UuidParameterDto) {
-    this.artistService.remove(params.id);
+  delete(@Param('id', ParseUUIDPipe) id: string) {
+    this.artistService.remove(id);
   }
 }

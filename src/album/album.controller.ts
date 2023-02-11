@@ -14,9 +14,10 @@ import { ApiBody, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { UuidParameterDto } from 'src/utils/dto/uuid.dto';
+
 import { StatusCodes } from 'http-status-codes';
 import { AlbumEntity } from './entities/album.entity';
+import { ParseUUIDPipe } from '@nestjs/common/pipes';
 
 @Controller('album')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -63,8 +64,8 @@ export class AlbumController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  getById(@Param() params: UuidParameterDto): AlbumEntity {
-    return this.albumService.findOne(params.id);
+  getById(@Param('id', ParseUUIDPipe) id: string): AlbumEntity {
+    return this.albumService.findOne(id);
   }
 
   @Put(':id')
@@ -84,10 +85,10 @@ export class AlbumController {
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
   update(
-    @Param() params: UuidParameterDto,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdateAlbumDto,
   ): AlbumEntity {
-    return this.albumService.update(params.id, updatePasswordDto);
+    return this.albumService.update(id, updatePasswordDto);
   }
 
   @Delete(':id')
@@ -105,7 +106,7 @@ export class AlbumController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  delete(@Param() params: UuidParameterDto) {
-    this.albumService.remove(params.id);
+  delete(@Param('id', ParseUUIDPipe) id: string) {
+    this.albumService.remove(id);
   }
 }

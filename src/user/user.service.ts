@@ -7,49 +7,60 @@ import {
   ENTITY_NOT_FOUND_ERROR,
   WRONG_CUR_PASSWORD_ERROR,
 } from 'src/utils/constants';
-import { UserRepository } from './in-memory/user.repository';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto): UserEntity {
-    return this.userRepository.create(createUserDto);
+  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+    return new UserEntity(
+      await this.prisma.user.create({
+        data: { ...createUserDto, version: 1 },
+      }),
+    );
   }
 
-  findAll(): UserEntity[] {
-    return this.userRepository.getAll();
+  async findAll(): Promise<UserEntity[]> {
+    return (await this.prisma.user.findMany()).map((e) => new UserEntity(e));
   }
 
-  findOne(id: string): UserEntity {
-    const user = this.userRepository.get(id);
+  async findOne(id: string): Promise<UserEntity> {
+    const user = await this.prisma.user.findFirst({ where: { id } });
     if (!user) {
       throw new NotFoundError(ENTITY_NOT_FOUND_ERROR);
     }
-    return user;
+    return new UserEntity(user);
   }
 
-  updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): UserEntity {
-    const user = this.userRepository.get(id);
+  async updatePassword(
+    id: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): Promise<UserEntity> {
+    const user = await this.prisma.user.findFirst({ where: { id } });
     if (!user) {
       throw new NotFoundError(ENTITY_NOT_FOUND_ERROR);
     }
     if (user.password === updatePasswordDto.oldPassword) {
-      this.userRepository.update({
-        ...user,
-        password: updatePasswordDto.newPassword,
-      });
-      return this.userRepository.get(id);
+      return new UserEntity(
+        await this.prisma.user.update({
+          where: { id },
+          data: {
+            version: user.version + 1,
+            password: updatePasswordDto.newPassword,
+          },
+        }),
+      );
     }
     throw new AccessDeniedError(WRONG_CUR_PASSWORD_ERROR);
   }
 
-  remove(id: string): UserEntity {
-    const user = this.userRepository.get(id);
+  async remove(id: string): Promise<void> {
+    const user = await this.prisma.user.findFirst({ where: { id } });
+    console.log('remove', id, user);
     if (!user) {
       throw new NotFoundError(ENTITY_NOT_FOUND_ERROR);
     }
-    this.userRepository.delete(id);
-    return user;
+    await this.prisma.user.delete({ where: { id } });
   }
 }

@@ -9,12 +9,13 @@ import {
   HttpCode,
   ClassSerializerInterceptor,
   UseInterceptors,
+  ParseUUIDPipe
 } from '@nestjs/common';
 import { ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { UuidParameterDto } from 'src/utils/dto/uuid.dto';
+
 import { StatusCodes } from 'http-status-codes';
 import { TrackEntity } from './entities/track.entity';
 
@@ -59,8 +60,8 @@ export class TrackController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  getById(@Param() params: UuidParameterDto): TrackEntity {
-    return this.trackService.findOne(params.id);
+  getById(@Param('id', ParseUUIDPipe) id: string): TrackEntity {
+    return this.trackService.findOne(id);
   }
 
   @Put(':id')
@@ -80,10 +81,10 @@ export class TrackController {
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
   update(
-    @Param() params: UuidParameterDto,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdateTrackDto,
   ): TrackEntity {
-    return this.trackService.update(params.id, updatePasswordDto);
+    return this.trackService.update(id, updatePasswordDto);
   }
 
   @Delete(':id')
@@ -98,7 +99,7 @@ export class TrackController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  delete(@Param() params: UuidParameterDto): TrackEntity {
-    return this.trackService.remove(params.id);
+  delete(@Param('id', ParseUUIDPipe) id: string): TrackEntity {
+    return this.trackService.remove(id);
   }
 }
