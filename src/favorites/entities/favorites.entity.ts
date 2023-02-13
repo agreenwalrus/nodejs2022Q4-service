@@ -13,7 +13,9 @@ export class FavoritesEntity {
   @ApiProperty({ description: 'Favotite tracks', type: [TrackEntity] })
   tracks: TrackEntity[];
 
-  constructor(track: Partial<FavoritesEntity>) {
-    Object.assign(this, track);
+  constructor(favs: any) {
+    this.artists = favs.artists.map((e) => new ArtistEntity(e.artist));
+    this.albums = favs.albums.map((e) => new ArtistEntity(e.album));
+    this.tracks = favs.tracks.map((e) => new ArtistEntity(e.track));
   }
 }

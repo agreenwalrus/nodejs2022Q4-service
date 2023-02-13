@@ -9,7 +9,7 @@ import {
   HttpCode,
   ClassSerializerInterceptor,
   UseInterceptors,
-  ParseUUIDPipe
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { TrackService } from './track.service';
@@ -35,7 +35,7 @@ export class TrackController {
     status: StatusCodes.BAD_REQUEST,
     description: 'Id is not valid UUIDv4',
   })
-  create(@Body() createTrackDto: CreateTrackDto): TrackEntity {
+  async create(@Body() createTrackDto: CreateTrackDto): Promise<TrackEntity> {
     return this.trackService.create(createTrackDto);
   }
 
@@ -45,7 +45,7 @@ export class TrackController {
     description: 'The found record',
     type: [TrackEntity],
   })
-  getAll(): TrackEntity[] {
+  async getAll(): Promise<TrackEntity[]> {
     return this.trackService.findAll();
   }
 
@@ -60,7 +60,7 @@ export class TrackController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  getById(@Param('id', ParseUUIDPipe) id: string): TrackEntity {
+  async getById(@Param('id', ParseUUIDPipe) id: string): Promise<TrackEntity> {
     return this.trackService.findOne(id);
   }
 
@@ -80,10 +80,10 @@ export class TrackController {
     description: 'Id is not valid UUIDv4',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdateTrackDto,
-  ): TrackEntity {
+  ): Promise<TrackEntity> {
     return this.trackService.update(id, updatePasswordDto);
   }
 
@@ -99,7 +99,7 @@ export class TrackController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  delete(@Param('id', ParseUUIDPipe) id: string): TrackEntity {
-    return this.trackService.remove(id);
+  async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    await this.trackService.remove(id);
   }
 }

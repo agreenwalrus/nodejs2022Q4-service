@@ -1,18 +1,12 @@
 import { Module } from '@nestjs/common';
-import { InMemoryDBModule } from '@nestjs-addons/in-memory-db';
 import { FavoritesService } from './favorites.service';
 import { FavoritesController } from './favorites.controller';
-import { FavoriteRepository } from './in-memory/favorites.repository';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   controllers: [FavoritesController],
-  providers: [FavoriteRepository, FavoritesService],
+  providers: [FavoritesService],
   exports: [FavoritesService],
-  imports: [
-    InMemoryDBModule.forFeature('track'),
-    InMemoryDBModule.forFeature('album'),
-    InMemoryDBModule.forFeature('artist'),
-    InMemoryDBModule.forFeature('favorite'),
-  ],
+  imports: [PrismaModule],
 })
 export class FavoritesModule {}

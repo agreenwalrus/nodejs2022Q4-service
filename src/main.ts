@@ -19,7 +19,7 @@ async function bootstrap() {
   SwaggerModule.setup('doc', app, document);
 
   const prismaService = app.get(PrismaService);
-  await prismaService.enableShutdownHooks(app)
+  await prismaService.enableShutdownHooks(app);
 
   await app.listen(PORT);
 }

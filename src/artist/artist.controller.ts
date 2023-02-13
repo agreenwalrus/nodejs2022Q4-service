@@ -31,7 +31,9 @@ export class ArtistController {
     type: ArtistEntity,
   })
   @ApiBody({ type: CreateArtistDto })
-  create(@Body() createArtistDto: CreateArtistDto): ArtistEntity {
+  async create(
+    @Body() createArtistDto: CreateArtistDto,
+  ): Promise<ArtistEntity> {
     return this.artistService.create(createArtistDto);
   }
 
@@ -41,7 +43,7 @@ export class ArtistController {
     description: 'The found record',
     type: [ArtistEntity],
   })
-  getAll(): ArtistEntity[] {
+  async getAll(): Promise<ArtistEntity[]> {
     return this.artistService.findAll();
   }
 
@@ -60,7 +62,7 @@ export class ArtistController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  getById(@Param('id', ParseUUIDPipe) id: string): ArtistEntity {
+  async getById(@Param('id', ParseUUIDPipe) id: string): Promise<ArtistEntity> {
     return this.artistService.findOne(id);
   }
 
@@ -80,10 +82,10 @@ export class ArtistController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdateArtistDto,
-  ): ArtistEntity {
+  ): Promise<ArtistEntity> {
     return this.artistService.update(id, updatePasswordDto);
   }
 
@@ -102,7 +104,7 @@ export class ArtistController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  delete(@Param('id', ParseUUIDPipe) id: string) {
-    this.artistService.remove(id);
+  async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    await this.artistService.remove(id);
   }
 }

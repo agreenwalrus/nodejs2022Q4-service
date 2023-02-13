@@ -35,7 +35,7 @@ export class AlbumController {
     status: StatusCodes.BAD_REQUEST,
     description: 'The artist is not found',
   })
-  create(@Body() createAlbumDto: CreateAlbumDto): AlbumEntity {
+  async create(@Body() createAlbumDto: CreateAlbumDto): Promise<AlbumEntity> {
     return this.albumService.create(createAlbumDto);
   }
 
@@ -45,7 +45,7 @@ export class AlbumController {
     description: 'The found record',
     type: [AlbumEntity],
   })
-  getAll(): AlbumEntity[] {
+  async getAll(): Promise<AlbumEntity[]> {
     return this.albumService.findAll();
   }
 
@@ -64,7 +64,7 @@ export class AlbumController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  getById(@Param('id', ParseUUIDPipe) id: string): AlbumEntity {
+  async getById(@Param('id', ParseUUIDPipe) id: string): Promise<AlbumEntity> {
     return this.albumService.findOne(id);
   }
 
@@ -84,10 +84,10 @@ export class AlbumController {
     description: 'Id is not valid UUIDv4',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdateAlbumDto,
-  ): AlbumEntity {
+  ): Promise<AlbumEntity> {
     return this.albumService.update(id, updatePasswordDto);
   }
 
@@ -106,7 +106,7 @@ export class AlbumController {
     description: 'Not found',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  delete(@Param('id', ParseUUIDPipe) id: string) {
-    this.albumService.remove(id);
+  async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    await this.albumService.remove(id);
   }
 }

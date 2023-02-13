@@ -1,100 +1,90 @@
 import { Injectable } from '@nestjs/common';
 
-import {
-  InMemoryDBService,
-  InjectInMemoryDBService,
-} from '@nestjs-addons/in-memory-db';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { AlbumRepository } from './in-memory/album.repository';
 import { BadRequestError, NotFoundError } from 'src/utils/errors';
 import {
   ARTIST_ENTITY_NOT_FOUND_ERROR,
   ENTITY_NOT_FOUND_ERROR,
 } from 'src/utils/constants';
-import { TrackEntity } from 'src/track/entities/track.entity';
-import { ArtistEntity } from 'src/artist/entities/artist.entity';
-import { Favorites } from 'src/favorites/entities/favorites.internal';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { AlbumEntity } from './entities/album.entity';
 
 @Injectable()
 export class AlbumService {
-  constructor(
-    private readonly albumRepository: AlbumRepository,
-    @InjectInMemoryDBService('track')
-    private readonly trackInMemoryDBService: InMemoryDBService<TrackEntity>,
-    @InjectInMemoryDBService('artist')
-    private readonly artirstInMemoryDBService: InMemoryDBService<ArtistEntity>,
-    @InjectInMemoryDBService('favorite')
-    private readonly favoriteInMemoryDBService: InMemoryDBService<Favorites>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  create(createAlbumDto: CreateAlbumDto) {
+  async create(createAlbumDto: CreateAlbumDto): Promise<AlbumEntity> {
     if (
       createAlbumDto.artistId !== null &&
-      !this.artirstInMemoryDBService.get(createAlbumDto.artistId)
+      !(await this.prisma.artist.findFirst({
+        where: { id: createAlbumDto.artistId },
+      }))
     ) {
       throw new BadRequestError(ARTIST_ENTITY_NOT_FOUND_ERROR);
     }
-    return this.albumRepository.create(createAlbumDto);
+    return this.prisma.album.create({ data: createAlbumDto });
   }
 
-  findAll() {
-    return this.albumRepository.getAll();
+  async findAll(): Promise<AlbumEntity[]> {
+    return this.prisma.album.findMany();
   }
 
-  findMany(clause: { key: string; value: any }) {
-    return this.albumRepository.query((u) => u[clause.key] === clause.value);
+  async findMany(clause: any): Promise<AlbumEntity[]> {
+    return this.prisma.album.findMany({ where: clause });
   }
 
-  findOne(id: string) {
-    const album = this.albumRepository.get(id);
+  async findOne(id: string): Promise<AlbumEntity> {
+    const album = await this.prisma.album.findFirst({ where: { id } });
     if (!album) {
       throw new NotFoundError(ENTITY_NOT_FOUND_ERROR);
     }
     return album;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const album = this.albumRepository.get(id);
+  async update(
+    id: string,
+    updateAlbumDto: UpdateAlbumDto,
+  ): Promise<AlbumEntity> {
+    const album = await this.prisma.album.findFirst({ where: { id } });
     if (!album) {
       throw new NotFoundError(ENTITY_NOT_FOUND_ERROR);
     }
     if (
       updateAlbumDto.artistId !== undefined &&
       updateAlbumDto.artistId !== null &&
-      !this.artirstInMemoryDBService.get(updateAlbumDto.artistId)
+      !(await this.prisma.artist.findFirst({
+        where: { id: updateAlbumDto.artistId },
+      }))
     ) {
       throw new BadRequestError(ARTIST_ENTITY_NOT_FOUND_ERROR);
     }
-    return this.albumRepository.update({ ...album, ...updateAlbumDto });
+    return this.prisma.album.update({ data: updateAlbumDto, where: { id } });
   }
 
-  remove(id: string) {
-    const album = this.albumRepository.get(id);
+  async remove(id: string): Promise<void> {
+    const album = await this.prisma.album.findFirst({ where: { id } });
+
     if (!album) {
       throw new NotFoundError(ENTITY_NOT_FOUND_ERROR);
     }
 
-    const tracks = this.trackInMemoryDBService.query(
-      (t) => t.albumId === album.id,
-    );
-    tracks.map((track) => {
-      this.trackInMemoryDBService.update({ ...track, albumId: null });
-    });
+    await this.prisma.album.delete({ where: { id } });
 
-    const favsRes = this.favoriteInMemoryDBService
-      .query((entity) => {
-        return entity.albums.includes(id);
-      })
-      .pop();
+    // const tracks = await this.prisma.track.findMany({
+    //   where: { albumId: album.id },
+    // });
 
-    if (favsRes !== undefined) {
-      const favs = new Favorites(favsRes);
-      favs.removeAlbum(id);
-      this.favoriteInMemoryDBService.update(favs);
-    }
+    // await Promise.all(
+    //   tracks.map((track) => {
+    //     this.prisma.track.update({
+    //       data: { albumId: null },
+    //       where: { id: track.id },
+    //     });
+    //   }),
+    // );
 
-    this.albumRepository.delete(id);
-    return album;
+    // await this.prisma.favoriteAlbum
+    //   .delete({ where: { albumId: album.id } });
   }
 }

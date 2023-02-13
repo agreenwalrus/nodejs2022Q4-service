@@ -1,128 +1,149 @@
 import { Injectable } from '@nestjs/common';
-import {
-  InMemoryDBService,
-  InjectInMemoryDBService,
-} from '@nestjs-addons/in-memory-db';
-import { FavoritesEntity } from './entities/favorites.entity';
-import { FavoriteRepository } from './in-memory/favorites.repository';
-import { Favorites } from './entities/favorites.internal';
-import { AlbumEntity } from 'src/album/entities/album.entity';
-import { ArtistEntity } from 'src/artist/entities/artist.entity';
-import { TrackEntity } from 'src/track/entities/track.entity';
 import { NotFoundError, UnprocessableEntityError } from 'src/utils/errors';
 import {
   ALBUM_ENTITY_NOT_FAVORITE_ERROR,
   ALBUM_ENTITY_NOT_FOUND_ERROR,
   ARTIST_ENTITY_NOT_FAVORITE_ERROR,
+  ARTIST_ENTITY_NOT_FOUND_ERROR,
   TRACK_ENTITY_NOT_FAVORITE_ERROR,
   TRACK_ENTITY_NOT_FOUND_ERROR,
 } from 'src/utils/constants';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { FavoritesEntity } from './entities/favorites.entity';
 
 @Injectable()
 export class FavoritesService {
-  constructor(
-    private readonly favotitesRepository: FavoriteRepository,
-    @InjectInMemoryDBService('track')
-    private readonly trackInMemoryDBService: InMemoryDBService<TrackEntity>,
-    @InjectInMemoryDBService('album')
-    private readonly albumInMemoryDBService: InMemoryDBService<AlbumEntity>,
-    @InjectInMemoryDBService('artist')
-    private readonly artirstInMemoryDBService: InMemoryDBService<ArtistEntity>,
-  ) {}
+  private _favoriteId;
 
-  private _prepareFavoritesEntity(favs: Favorites) {
-    const artists = favs.artists
-      .map((artistId) => this.artirstInMemoryDBService.get(artistId))
-      .map((i) => new ArtistEntity(i));
-    const albums = favs.albums
-      .map((albumId) => this.albumInMemoryDBService.get(albumId))
-      .map((i) => new AlbumEntity(i));
-    const tracks = favs.tracks
-      .map((trackId) => this.trackInMemoryDBService.get(trackId))
-      .map((i) => new TrackEntity(i));
-    return new FavoritesEntity({ artists, albums, tracks });
+  constructor(private readonly prisma: PrismaService) {
+    this._init();
   }
 
-  findAll(): FavoritesEntity {
-    const favs = this.favotitesRepository.get();
-    return this._prepareFavoritesEntity(favs);
+  private async _init() {
+    const id = await this._getSingleId();
+    if (!id) {
+      await this.prisma.favorite.create({ data: {} });
+    }
+    this._favoriteId = await this._getSingleId();
   }
 
-  addArtist(id: string): FavoritesEntity {
-    if (!this.artirstInMemoryDBService.get(id)) {
-      throw new UnprocessableEntityError(TRACK_ENTITY_NOT_FOUND_ERROR);
+  private async _getSingleId(): Promise<string> {
+    const favs = await this.prisma.favorite.findMany();
+    if (favs.length !== 0) {
+      return favs[0].id;
+    } else {
+      return undefined;
+    }
+  }
+
+  private async _getSingle(): Promise<FavoritesEntity> {
+    const favs = await this.prisma.favorite.findFirst({
+      where: { id: this._favoriteId },
+      select: {
+        id: false,
+        tracks: {
+          select: {
+            track: true,
+          },
+        },
+        albums: {
+          select: {
+            album: true,
+          },
+        },
+        artists: {
+          select: {
+            artist: true,
+          },
+        },
+      },
+    });
+
+    return new FavoritesEntity(favs);
+  }
+
+  async findAll(): Promise<FavoritesEntity> {
+    return await this._getSingle();
+  }
+
+  async addArtist(id: string): Promise<FavoritesEntity> {
+    if (!(await this.prisma.artist.findFirst({ where: { id } }))) {
+      throw new UnprocessableEntityError(ARTIST_ENTITY_NOT_FOUND_ERROR);
     }
 
-    const favs = this.favotitesRepository.get();
-    favs.addArtist(id);
-    this.favotitesRepository.update(favs);
-    return this._prepareFavoritesEntity(favs);
+    await this.prisma.favoriteArtist.create({
+      data: { favoriteId: this._favoriteId, artistId: id },
+    });
+
+    return this._getSingle();
   }
 
-  removeArtist(id: string): FavoritesEntity {
-    const favs = this.favotitesRepository.get();
-    if (!this.isArtistInFavs(id)) {
+  async removeArtist(id: string): Promise<FavoritesEntity> {
+    if (
+      !(await this.prisma.favoriteArtist.findFirst({ where: { artistId: id } }))
+    ) {
       throw new NotFoundError(ARTIST_ENTITY_NOT_FAVORITE_ERROR);
     }
-    favs.removeArtist(id);
-    this.favotitesRepository.update(favs);
-    return this._prepareFavoritesEntity(favs);
+
+    await this.prisma.favoriteArtist.delete({
+      where: {
+        favoriteId_artistId: { favoriteId: this._favoriteId, artistId: id },
+      },
+    });
+    return this._getSingle();
   }
 
-  addAlbum(id: string): FavoritesEntity {
-    if (!this.albumInMemoryDBService.get(id)) {
+  async addAlbum(id: string): Promise<FavoritesEntity> {
+    if (!(await this.prisma.album.findFirst({ where: { id } }))) {
       throw new UnprocessableEntityError(ALBUM_ENTITY_NOT_FOUND_ERROR);
     }
 
-    const favs = this.favotitesRepository.get();
-    favs.addAlbum(id);
-    this.favotitesRepository.update(favs);
-    return this._prepareFavoritesEntity(favs);
+    await this.prisma.favoriteAlbum.create({
+      data: { favoriteId: this._favoriteId, albumId: id },
+    });
+
+    return this._getSingle();
   }
 
-  removeAlbum(id: string): FavoritesEntity {
-    const favs = this.favotitesRepository.get();
-    if (!this.isAlbumInFavs(id)) {
+  async removeAlbum(id: string): Promise<FavoritesEntity> {
+    if (
+      !(await this.prisma.favoriteAlbum.findFirst({ where: { albumId: id } }))
+    ) {
       throw new NotFoundError(ALBUM_ENTITY_NOT_FAVORITE_ERROR);
     }
-    favs.removeAlbum(id);
-    this.favotitesRepository.update(favs);
-    return this._prepareFavoritesEntity(favs);
+
+    await this.prisma.favoriteAlbum.delete({
+      where: {
+        favoriteId_albumId: { favoriteId: this._favoriteId, albumId: id },
+      },
+    });
+    return this._getSingle();
   }
 
-  addTrack(id: string): FavoritesEntity {
-    if (!this.trackInMemoryDBService.get(id)) {
+  async addTrack(id: string): Promise<FavoritesEntity> {
+    if (!(await this.prisma.track.findFirst({ where: { id } }))) {
       throw new UnprocessableEntityError(TRACK_ENTITY_NOT_FOUND_ERROR);
     }
 
-    const favs = this.favotitesRepository.get();
-    favs.addTrack(id);
-    this.favotitesRepository.update(favs);
-    return this._prepareFavoritesEntity(favs);
+    await this.prisma.favoriteTrack.create({
+      data: { favoriteId: this._favoriteId, trackId: id },
+    });
+
+    return this._getSingle();
   }
 
-  removeTrack(id: string): FavoritesEntity {
-    const favs = this.favotitesRepository.get();
-    if (!this.isTrackInFavs(id)) {
+  async removeTrack(id: string): Promise<FavoritesEntity> {
+    if (
+      !(await this.prisma.favoriteTrack.findFirst({ where: { trackId: id } }))
+    ) {
       throw new NotFoundError(TRACK_ENTITY_NOT_FAVORITE_ERROR);
     }
-    favs.removeTrack(id);
-    this.favotitesRepository.update(favs);
-    return this._prepareFavoritesEntity(favs);
-  }
 
-  isTrackInFavs(id: string): boolean {
-    const favs = this.favotitesRepository.get();
-    return favs.tracks.includes(id);
-  }
-
-  isAlbumInFavs(id: string): boolean {
-    const favs = this.favotitesRepository.get();
-    return favs.albums.includes(id);
-  }
-
-  isArtistInFavs(id: string): boolean {
-    const favs = this.favotitesRepository.get();
-    return favs.artists.includes(id);
+    await this.prisma.favoriteTrack.delete({
+      where: {
+        favoriteId_trackId: { favoriteId: this._favoriteId, trackId: id },
+      },
+    });
+    return this._getSingle();
   }
 }

@@ -12,8 +12,8 @@ import { ApiResponse, ApiParam } from '@nestjs/swagger';
 import { FavoritesService } from './favorites.service';
 
 import { StatusCodes } from 'http-status-codes';
-import { FavoritesEntity } from './entities/favorites.entity';
 import { ParseUUIDPipe } from '@nestjs/common/pipes';
+import { FavoritesEntity } from './entities/favorites.entity';
 
 @Controller('favs')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -24,9 +24,9 @@ export class FavoritesController {
   @ApiResponse({
     status: StatusCodes.OK,
     description: 'Favorites',
-    type: FavoritesEntity,
+    type: Promise<FavoritesEntity>,
   })
-  getAll(): FavoritesEntity {
+  async getAll(): Promise<FavoritesEntity> {
     return this.favoritesService.findAll();
   }
 
@@ -34,7 +34,7 @@ export class FavoritesController {
   @ApiResponse({
     status: StatusCodes.CREATED,
     description: 'The artist is added',
-    type: FavoritesEntity,
+    type: Promise<FavoritesEntity>,
   })
   @ApiResponse({
     status: StatusCodes.BAD_REQUEST,
@@ -45,7 +45,9 @@ export class FavoritesController {
     description: "The artist doesn't exists",
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  addArtist(@Param('id', ParseUUIDPipe) id: string): FavoritesEntity {
+  async addArtist(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<FavoritesEntity> {
     return this.favoritesService.addArtist(id);
   }
 
@@ -64,15 +66,17 @@ export class FavoritesController {
     description: 'The artist is not in favorites',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  removeArtist(@Param('id', ParseUUIDPipe) id: string) {
-    this.favoritesService.removeArtist(id);
+  async removeArtist(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<FavoritesEntity> {
+    return await this.favoritesService.removeArtist(id);
   }
 
   @Post('album/:id')
   @ApiResponse({
     status: StatusCodes.CREATED,
     description: 'The album is added',
-    type: FavoritesEntity,
+    type: Promise<FavoritesEntity>,
   })
   @ApiResponse({
     status: StatusCodes.BAD_REQUEST,
@@ -83,7 +87,7 @@ export class FavoritesController {
     description: "The album doesn't exists",
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  addAlbum(@Param('id', ParseUUIDPipe) id: string): FavoritesEntity {
+  addAlbum(@Param('id', ParseUUIDPipe) id: string): Promise<FavoritesEntity> {
     return this.favoritesService.addAlbum(id);
   }
 
@@ -102,15 +106,17 @@ export class FavoritesController {
     description: 'The album is not in favorites',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
-    this.favoritesService.removeAlbum(id);
+  async removeAlbum(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<FavoritesEntity> {
+    return this.favoritesService.removeAlbum(id);
   }
 
   @Post('track/:id')
   @ApiResponse({
     status: StatusCodes.CREATED,
     description: 'The track is added',
-    type: FavoritesEntity,
+    type: Promise<FavoritesEntity>,
   })
   @ApiResponse({
     status: StatusCodes.BAD_REQUEST,
@@ -121,7 +127,9 @@ export class FavoritesController {
     description: "The track doesn't exists",
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  addTrack(@Param('id', ParseUUIDPipe) id: string): FavoritesEntity {
+  async addTrack(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<FavoritesEntity> {
     return this.favoritesService.addTrack(id);
   }
 
@@ -140,7 +148,9 @@ export class FavoritesController {
     description: 'The track is not in favorites',
   })
   @ApiParam({ name: 'id', type: String, format: 'UUIDv4' })
-  removeTrack(@Param('id', ParseUUIDPipe) id: string) {
-    this.favoritesService.removeTrack(id);
+  async removeTrack(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<FavoritesEntity> {
+    return this.favoritesService.removeTrack(id);
   }
 }
