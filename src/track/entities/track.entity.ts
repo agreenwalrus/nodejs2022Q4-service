@@ -1,7 +1,5 @@
-import { InMemoryDBEntity } from '@nestjs-addons/in-memory-db';
-
 import { ApiProperty } from '@nestjs/swagger';
-export class TrackEntity implements InMemoryDBEntity {
+export class TrackEntity {
   @ApiProperty({ description: 'Id', format: 'UUIDv4' })
   id: string;
 
