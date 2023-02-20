@@ -1,9 +1,11 @@
 # Home Library Service
 
+
 ## Prerequisites
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Docker - [Download & Install Docker](https://www.docker.com/).
 
 ## Downloading
 
@@ -11,13 +13,36 @@
 git clone https://github.com/agreenwalrus/nodejs2022Q4-service
 ```
 
-## Installing NPM modules
+## Check out the branch
+
+```
+git checkout docker
+```
+
+## Running application
+
+! Create .env file from .env.example
+
+### Running application with Docker
+
+```
+docker compose -f "docker-compose.yml" up -d --build 
+```
+
+### Stop the application
+
+```
+docker compose -f "docker-compose.yml" down  
+```
+
+### Running application with npm
+#### Installing NPM modules
 
 ```
 npm install --legacy-peer-deps
 ```
 
-## Running application
+#### Running application
 
 ```
 npm start
