@@ -1,0 +1,96 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgcrypto]
+}
+
+model User {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  login     String
+  version   Int      @default(1)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  password  String
+
+  @@map("user")
+}
+
+model Track {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  artistId       String?         @map("artist_id") @db.Uuid
+  albumId        String?         @map("album_id") @db.Uuid
+  duration       Int
+  album          Album?          @relation(fields: [albumId], references: [id])
+  artist         Artist?         @relation(fields: [artistId], references: [id])
+  favoriteTracks FavoriteTrack[] @relation("favoriteTrack")
+
+  @@map("track")
+}
+
+model Artist {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  grammy          Boolean          @default(false)
+  albums          Album[]
+  tracks          Track[]
+  favoriteArtists FavoriteArtist[]
+
+  @@map("artist")
+}
+
+model Album {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  year           Int
+  artistId       String?         @map("artist_id") @db.Uuid
+  artist         Artist?         @relation(fields: [artistId], references: [id])
+  tracks         Track[]
+  favoriteAlbums FavoriteAlbum[] @relation("favoriteAlbum")
+
+  @@map("album")
+}
+
+model Favorite {
+  id      String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  albums  FavoriteAlbum[]
+  artists FavoriteArtist[]
+  tracks  FavoriteTrack[]
+
+  @@map("favorite")
+}
+
+model FavoriteArtist {
+  artistId   String   @map("artist_id") @db.Uuid
+  favoriteId String   @db.Uuid
+  artist     Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  favorite   Favorite @relation(fields: [favoriteId], references: [id])
+
+  @@unique([favoriteId, artistId])
+  @@map("favorite_artist")
+}
+
+model FavoriteAlbum {
+  albumId    String   @map("album_id") @db.Uuid
+  favoriteId String   @db.Uuid
+  album      Album    @relation("favoriteAlbum", fields: [albumId], references: [id], onDelete: Cascade)
+  favorite   Favorite @relation(fields: [favoriteId], references: [id])
+
+  @@unique([favoriteId, albumId])
+  @@map("favorite_album")
+}
+
+model FavoriteTrack {
+  trackId    String   @map("track_id") @db.Uuid
+  favoriteId String   @db.Uuid
+  track      Track    @relation("favoriteTrack", fields: [trackId], references: [id], onDelete: Cascade)
+  favorite   Favorite @relation(fields: [favoriteId], references: [id])
+
+  @@unique([favoriteId, trackId])
+  @@map("favorite_track")
+}

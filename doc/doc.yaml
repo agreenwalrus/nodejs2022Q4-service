@@ -1,0 +1,780 @@
+openapi: 3.0.0
+info:
+  title: Home Library Service
+  description: Home Library Service API description
+  version: '1.0'
+  contact: {}
+tags: []
+
+servers:
+  - url: /doc
+
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+  /user:
+    post:
+      operationId: UserController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: The record is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEntity'
+        '400':
+          description: The artist is not found
+    get:
+      operationId: UserController_getAll
+      parameters: []
+      responses:
+        '200':
+          description: The found record
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserEntity'
+  /user/{id}:
+    get:
+      operationId: UserController_getById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '200':
+          description: The found record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: Not found
+    put:
+      operationId: UserController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordDto'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: Not found
+    delete:
+      operationId: UserController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: Not found
+  /artist:
+    post:
+      operationId: ArtistController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateArtistDto'
+      responses:
+        '201':
+          description: The record is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtistEntity'
+    get:
+      operationId: ArtistController_getAll
+      parameters: []
+      responses:
+        '200':
+          description: The found record
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArtistEntity'
+  /artist/{id}:
+    get:
+      operationId: ArtistController_getById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '200':
+          description: The found record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtistEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: Not found
+    put:
+      operationId: ArtistController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateArtistDto'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtistEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: Not found
+    delete:
+      operationId: ArtistController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: Not found
+  /album:
+    post:
+      operationId: AlbumController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAlbumDto'
+      responses:
+        '201':
+          description: The record is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlbumEntity'
+        '400':
+          description: The artist is not found
+    get:
+      operationId: AlbumController_getAll
+      parameters: []
+      responses:
+        '200':
+          description: The found record
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlbumEntity'
+  /album/{id}:
+    get:
+      operationId: AlbumController_getById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '200':
+          description: The found record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlbumEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: Not found
+    put:
+      operationId: AlbumController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAlbumDto'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlbumEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: The artist is not found
+    delete:
+      operationId: AlbumController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: Not found
+  /track:
+    post:
+      operationId: TrackController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTrackDto'
+      responses:
+        '201':
+          description: The record is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackEntity'
+        '400':
+          description: Id is not valid UUIDv4
+    get:
+      operationId: TrackController_getAll
+      parameters: []
+      responses:
+        '200':
+          description: The found record
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrackEntity'
+  /track/{id}:
+    get:
+      operationId: TrackController_getById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '200':
+          description: The found record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackEntity'
+        '404':
+          description: Not found
+    put:
+      operationId: TrackController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTrackDto'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: Not found
+    delete:
+      operationId: TrackController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '204':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackEntity'
+        '404':
+          description: Not found
+  /favs:
+    get:
+      operationId: FavoritesController_getAll
+      parameters: []
+      responses:
+        '200':
+          description: Favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesEntity'
+  /favs/artist/{id}:
+    post:
+      operationId: FavoritesController_addArtist
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '201':
+          description: The artist is added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '422':
+          description: The artist doesn't exists
+    delete:
+      operationId: FavoritesController_removeArtist
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: The artist is not in favorites
+  /favs/album/{id}:
+    post:
+      operationId: FavoritesController_addAlbum
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '201':
+          description: The album is added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '422':
+          description: The album doesn't exists
+    delete:
+      operationId: FavoritesController_removeAlbum
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: The album is not in favorites
+  /favs/track/{id}:
+    post:
+      operationId: FavoritesController_addTrack
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '201':
+          description: The track is added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesEntity'
+        '400':
+          description: Id is not valid UUIDv4
+        '422':
+          description: The track doesn't exists
+    delete:
+      operationId: FavoritesController_removeTrack
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: UUIDv4
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Id is not valid UUIDv4
+        '404':
+          description: The track is not in favorites
+
+components:
+  schemas:
+    CreateUserDto:
+      type: object
+      properties:
+        login:
+          type: string
+          description: Login
+          example: TestUser
+        password:
+          type: string
+          description: Password
+          example: psw
+      required:
+        - login
+        - password
+    UserEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id
+          format: UUIDv4
+        login:
+          type: string
+          description: Login
+          example: Test User
+        version:
+          type: number
+          description: Version of the user
+          example: 1
+        createdAt:
+          type: number
+          description: Created at
+          format: timestamp
+        updatedAt:
+          type: number
+          description: Last updated at
+          format: timestamp
+      required:
+        - id
+        - login
+        - version
+        - createdAt
+        - updatedAt
+    UpdatePasswordDto:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          description: Current password
+          example: psw
+        newPassword:
+          type: string
+          description: New password
+          example: psw
+      required:
+        - oldPassword
+        - newPassword
+    CreateArtistDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the artist
+          example: Freddie Mercury
+        grammy:
+          type: boolean
+          description: Grammy
+          example: false
+      required:
+        - name
+        - grammy
+    ArtistEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id
+          format: UUIDv4
+        name:
+          type: string
+          description: The name of the artist
+          example: Freddie Mercury
+        grammy:
+          type: boolean
+          description: Grammy
+          example: false
+      required:
+        - id
+        - name
+        - grammy
+    UpdateArtistDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the artist
+          example: Freddie Mercury
+        grammy:
+          type: boolean
+          description: Grammy
+          example: false
+    CreateAlbumDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the album
+          example: Innuendo
+        year:
+          type: number
+          description: The year of the album
+          example: 1991
+        artistId:
+          type: string
+          description: Artist
+          nullable: true
+          format: UUIDv4
+      required:
+        - name
+        - year
+        - artistId
+    AlbumEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id
+          format: UUIDv4
+        name:
+          type: string
+          description: The name of the album
+          example: Innuendo
+        year:
+          type: number
+          description: The year of the album
+          example: 1991
+        artistId:
+          type: string
+          description: Artist
+          nullable: true
+          format: UUIDv4
+      required:
+        - id
+        - name
+        - year
+        - artistId
+    UpdateAlbumDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the album
+          example: Innuendo
+        year:
+          type: number
+          description: The year of the album
+          example: 1991
+        artistId:
+          type: string
+          description: Artist
+          nullable: true
+          format: UUIDv4
+    CreateTrackDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the track
+          example: The Show Must Go On
+        artistId:
+          type: string
+          description: Artist
+          nullable: true
+          format: UUIDv4
+        albumId:
+          type: string
+          description: Album
+          nullable: true
+          format: UUIDv4
+        duration:
+          type: number
+          description: In seconds
+          example: 192
+      required:
+        - name
+        - artistId
+        - albumId
+        - duration
+    TrackEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id
+          format: UUIDv4
+        name:
+          type: string
+          description: The name of the track
+          example: The Show Must Go On
+        artistId:
+          type: string
+          description: Artist
+          nullable: true
+          format: UUIDv4
+        albumId:
+          type: string
+          description: Album
+          nullable: true
+          format: UUIDv4
+        duration:
+          type: number
+          description: In seconds
+          example: 192
+      required:
+        - id
+        - name
+        - artistId
+        - albumId
+        - duration
+    UpdateTrackDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the track
+          example: The Show Must Go On
+        artistId:
+          type: string
+          description: Artist
+          nullable: true
+          format: UUIDv4
+        albumId:
+          type: string
+          description: Album
+          nullable: true
+          format: UUIDv4
+        duration:
+          type: number
+          description: In seconds
+          example: 192
+    FavoritesEntity:
+      type: object
+      properties:
+        artists:
+          description: Favotite artists
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtistEntity'
+        albums:
+          description: Favotite albums
+          type: array
+          items:
+            $ref: '#/components/schemas/AlbumEntity'
+        tracks:
+          description: Favotite tracks
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackEntity'
+      required:
+        - artists
+        - albums
+        - tracks
