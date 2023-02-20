@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  db:
+    build:
+      dockerfile: Dockerfile.database
+      context: .
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    volumes:
+      - library-postgresql:/var/lib/postgresql/data
+      - library-postgresql-logs:/var/lib/postgresql/logs
+    networks:
+      - library-network
+
+  api:
+    depends_on:
+      - db
+    build:
+      dockerfile: Dockerfile.backend
+      context: .
+      target: development
+    restart: always
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - "./src/:/app/src/"
+      - library-backend-node-modules:/app/src/node_modules
+    networks:
+      - library-network
+
+volumes:
+  library-postgresql:
+  library-backend-node-modules:
+  library-postgresql-logs:
+
+networks:
+  library-network:
+    driver: bridge
