@@ -35,17 +35,10 @@ docker compose -f "docker-compose.yml" up -d --build
 docker compose -f "docker-compose.yml" down  
 ```
 
-### Running application with npm
-#### Installing NPM modules
+## Installing NPM modules
 
 ```
 npm install --legacy-peer-deps
-```
-
-#### Running application
-
-```
-npm start
 ```
 
 After starting the app on port (4000 as default) you can open
